@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Head from 'next/head';
+import 'reset-css';
 
 export default function App({ Component, pageProps }: AppProps) {
   const queryClientRef = useRef<QueryClient>();
@@ -13,6 +14,8 @@ export default function App({ Component, pageProps }: AppProps) {
       defaultOptions: {
         queries: {
           retry: 1,
+          cacheTime: 1000 * 60 * 60, // 1시간. cacheTime이 지나면 새로 fetch
+          staleTime: 1000 * 60 * 60 * 24, // 24시간 이후에 다시 fetch
         },
       },
     });
