@@ -15,6 +15,7 @@
 
 ## 목표
 
+- 페이지 렌더는 SSG를 기본으로 하고, Fallback 으로 SSR / 종국에는 ISG 되는 형태로.
 - 데이터 호출 책임이 위임된 독립해서 재사용 가능한 컴포넌트 구현
 - Next.js + React Query 조합
 - Container Component + Presentational Component 패턴으로 작성
@@ -24,6 +25,6 @@
 ---
 ## TODO
 - [x] React Query 전역/지역 설정 추가
-- [ ] ServerSide Rendering에 필요한 데이터 추가/ 처리
+- [x] ServerSide Rendering에 필요한 데이터 추가/ 처리
 - [ ] 데이터 핸들링 처리가 위임된 컴포넌트 예제 추가(with Error Boundary)
 - [ ] 데이터 Fetch 실패 시 재시도 로직 추가

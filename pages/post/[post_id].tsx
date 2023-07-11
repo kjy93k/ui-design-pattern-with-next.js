@@ -3,10 +3,13 @@ import styled from '@emotion/styled';
 import axios from 'axios';
 import Head from 'next/head';
 import { useQuery } from '@tanstack/react-query';
+import { ApiErrorBoundary } from '@/components/ApiErrorBoundary';
+import PostDetailComponent from '@/components/PostDetailComponent';
 
-function PostDetail({ id: post_id }: { id: string }) {
+function PostDetailPage({ id: post_id }: { id: string }) {
   const { data } = useQuery({
     queryKey: ['post', post_id],
+    enabled: !!post_id,
     queryFn: async () => {
       const { data } = await axios.get(`https://jsonplaceholder.typicode.com/posts/${post_id}`);
       return data;
@@ -19,7 +22,9 @@ function PostDetail({ id: post_id }: { id: string }) {
         <title>{data?.title}</title>
       </Head>
       <PostDetailStyledComponent>
-        <div className={'csr'}>포스트 상세 내용을 클라이언트에서 호출</div>
+        <ApiErrorBoundary>
+          <PostDetailComponent post_id={post_id} />
+        </ApiErrorBoundary>
         <div className={'csr'}>포스트 댓글을 클라이언트에서 호출</div>
         <div className={'serverside-rendered-data'}>
           <p>서버에서 렌더한 메타 데이터를 보여줌</p>
@@ -44,9 +49,16 @@ const PostDetailStyledComponent = styled.article`
   }
 `;
 
-export default PostDetail;
+export default PostDetailPage;
 
-export async function getServerSideProps({ params: { post_id } }: { params: { post_id: string } }) {
+export async function getStaticPaths() {
+  return {
+    paths: [{ params: { post_id: '1' } }, { params: { post_id: '2' } }, { params: { post_id: '3' } }],
+    fallback: true,
+  };
+}
+
+export async function getStaticProps({ params: { post_id } }: { params: { post_id: string } }) {
   const queryClient = new QueryClient();
   // 프리페치로 json placeholder 데이터를 적절히 axios get으로 호출해서 관리.
   await queryClient.prefetchQuery(['post', post_id], async () => {

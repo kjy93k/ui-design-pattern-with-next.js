@@ -16,6 +16,7 @@ export default function App({ Component, pageProps }: AppProps) {
           retry: 1,
           cacheTime: 1000 * 60 * 60, // 1시간. cacheTime이 지나면 새로 fetch
           staleTime: 1000 * 60 * 60 * 24, // 24시간 이후에 다시 fetch
+          useErrorBoundary: true,
         },
       },
     });
