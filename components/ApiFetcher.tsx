@@ -1,13 +1,13 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, ReactElement, ReactNode, useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
 const DataContext = createContext<any | undefined>(undefined);
 
-export function useData() {
+export function useFetchData() {
   const context = useContext(DataContext);
   if (context === undefined) {
-    throw new Error('useData must be used within a ApiFetcher');
+    throw new Error('useFetchData must be used within a ApiFetcher');
   }
   return context;
 }
@@ -31,5 +31,14 @@ export function ApiFetcher({
     throw error;
   }
 
-  return <DataContext.Provider value={data}>{children}</DataContext.Provider>;
+  return (
+    <>
+      {React.Children.map(children, (child: ReactNode) => {
+        if (React.isValidElement(child)) {
+          return React.cloneElement(child, { data } as any);
+        }
+        return child;
+      })}
+    </>
+  );
 }
