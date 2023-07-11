@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import axios from 'axios';
 import Head from 'next/head';
 import { useQuery } from '@tanstack/react-query';
-import { ApiErrorBoundary } from '@/components/ApiErrorBoundary';
+import { HandledErrorBoundary } from '@/components/HandledErrorBoundary';
 import PostDetailComponent from '@/components/PostDetailComponent';
 
 function PostDetailPage({ id: post_id }: { id: string }) {
@@ -22,9 +22,9 @@ function PostDetailPage({ id: post_id }: { id: string }) {
         <title>{data?.title}</title>
       </Head>
       <PostDetailStyledComponent>
-        <ApiErrorBoundary>
+        <HandledErrorBoundary>
           <PostDetailComponent post_id={post_id} />
-        </ApiErrorBoundary>
+        </HandledErrorBoundary>
         <div className={'csr'}>포스트 댓글을 클라이언트에서 호출</div>
         <div className={'serverside-rendered-data'}>
           <p>서버에서 렌더한 메타 데이터를 보여줌</p>

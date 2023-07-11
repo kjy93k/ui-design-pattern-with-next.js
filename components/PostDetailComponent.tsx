@@ -1,39 +1,32 @@
 import styled from '@emotion/styled';
-import React from 'react';
+import React, { useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { HandledErrorBoundary } from '@/components/HandledErrorBoundary';
+import { ApiFetcher } from '@/components/ApiFetcher';
 
-function PostDetailComponent({ post_id }: { post_id: string }) {
-  // TODO: 재사용 가능하게 분리 필요.
-  const { data, isLoading } = useQuery(
-    ['postDetail', post_id],
-    async () => {
-      const { data } = await axios.get(`https://jsonplaceholder.typicode.com/posts/${post_id}`);
-      return data;
-    },
-    {
-      enabled: !!post_id,
-    },
-  );
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+export default function PostDetailComponent({ post_id }: { post_id: string }) {
+  const fetchPostDetail = async () => {
+    const { data } = await axios.get(`https://jsonplaceholder.typicode.com/posts/${post_id}`);
+    return data;
+  };
 
   return (
-    <PresentationalComponent>
-      <h2>클라이언트에서 부른 데이터</h2>
-      <p>{data.body}</p>
-    </PresentationalComponent>
+    <HandledErrorBoundary>
+      <ApiFetcher queryKey={['postDetail', post_id]} fetchFunction={fetchPostDetail}>
+        <PresentationalComponent />
+      </ApiFetcher>
+    </HandledErrorBoundary>
   );
 }
 
-const PresentationalComponent = styled.div`
-  padding: 24px;
-  box-sizing: border-box;
-  background-color: teal;
-  color: white;
-  margin: 24px 0;
-`;
+function PresentationalComponent() {
+  const data = useContext(DataContext);
 
-export default PostDetailComponent;
+  return (
+    <div>
+      <h2>클라이언트에서 부른 데이터</h2>
+      <p>{data.body}</p>
+    </div>
+  );
+}
