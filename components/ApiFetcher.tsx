@@ -1,16 +1,5 @@
-import React, { createContext, ReactElement, ReactNode, useContext } from 'react';
+import React, { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-
-const DataContext = createContext<any | undefined>(undefined);
-
-export function useFetchData() {
-  const context = useContext(DataContext);
-  if (context === undefined) {
-    throw new Error('useFetchData must be used within a ApiFetcher');
-  }
-  return context;
-}
 
 export function ApiFetcher({
   queryKey,
@@ -35,7 +24,7 @@ export function ApiFetcher({
     <>
       {React.Children.map(children, (child: ReactNode) => {
         if (React.isValidElement(child)) {
-          return React.cloneElement(child, { data } as any);
+          return React.cloneElement(child, { data } as object);
         }
         return child;
       })}
