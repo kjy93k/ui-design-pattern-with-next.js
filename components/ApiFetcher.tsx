@@ -2,7 +2,15 @@ import React, { createContext, useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
-const DataContext = createContext();
+const DataContext = createContext<any | undefined>(undefined);
+
+export function useData() {
+  const context = useContext(DataContext);
+  if (context === undefined) {
+    throw new Error('useData must be used within a ApiFetcher');
+  }
+  return context;
+}
 
 export function ApiFetcher({
   queryKey,

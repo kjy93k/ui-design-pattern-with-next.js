@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { HandledErrorBoundary } from '@/components/HandledErrorBoundary';
-import { ApiFetcher } from '@/components/ApiFetcher';
+import { ApiFetcher, useData } from '@/components/ApiFetcher';
 
 export default function PostDetailComponent({ post_id }: { post_id: string }) {
   const fetchPostDetail = async () => {
@@ -21,7 +21,7 @@ export default function PostDetailComponent({ post_id }: { post_id: string }) {
 }
 
 function PresentationalComponent() {
-  const data = useContext(DataContext);
+  const data = useData();
 
   return (
     <div>
