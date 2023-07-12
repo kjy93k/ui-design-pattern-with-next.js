@@ -1,17 +1,17 @@
 import React, { ReactNode } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { QueryObserverResult, useQuery } from '@tanstack/react-query';
+import { AxiosResponse } from 'axios';
 
 export function ApiFetcher({
-  queryKey,
-  fetchFunction,
+  query,
   children,
 }: {
-  queryKey: any;
-  fetchFunction: () => Promise<any>;
+  query: QueryObserverResult<any, unknown>;
   children: React.ReactNode;
 }) {
-  const { data, isLoading, error } = useQuery(queryKey, fetchFunction);
+  const { isLoading, data, error } = query;
 
+  // TODO: 스켈레톤 추가 필요
   if (isLoading) {
     return <div>Loading...</div>;
   }

@@ -1,26 +1,20 @@
-import styled from '@emotion/styled';
-import React, { useContext } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { Suspense } from 'react';
 import axios from 'axios';
-import { HandledErrorBoundary } from '@/components/HandledErrorBoundary';
-import { ApiFetcher, useFetchData } from '@/components/ApiFetcher';
+import { ApiErrorBoundary } from '@/components/ApiErrorBoundary';
+import { ApiFetcher } from '@/components/ApiFetcher';
+import { useQuery } from '@tanstack/react-query';
+import { usePostDetailQuery } from '@/hooks/usePostDetailQuery';
 
 export default function PostDetailComponent({ post_id }: { post_id: string }) {
-  const fetchPostDetail = async () => {
-    const { data } = await axios.get(`https://jsonplaceholder.typicode.com/posts/${post_id}`);
-    return data;
-  };
+  const query = usePostDetailQuery(post_id);
 
   return (
     // TODO: 어떤 주제로 오류를 묶을지 미리 범주를 정의해두고 수집하는 것도 의미 있을듯(Sentry 등 미들웨어 데이터 적재 시 활용)
-    <HandledErrorBoundary>
-      <ApiFetcher queryKey={['postDetail', post_id]} fetchFunction={fetchPostDetail}>
+    <ApiErrorBoundary>
+      <ApiFetcher query={query}>
         <PresentationalComponent />
       </ApiFetcher>
-      <ApiFetcher queryKey={['postDetail', post_id]} fetchFunction={fetchPostDetail}>
-        <PresentationalComponent />
-      </ApiFetcher>
-    </HandledErrorBoundary>
+    </ApiErrorBoundary>
   );
 }
 
