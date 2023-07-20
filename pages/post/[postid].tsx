@@ -7,7 +7,7 @@ import { PostDetailComponent } from '@/components/PostDetailComponent';
 import { PostCommentsComponent } from '@/components/PostCommentsComponent';
 import { getPostDetail } from '@/api/jsonplaceholder';
 
-function PostDetailPage({ id: postId }: { id: string }) {
+function PostDetailPage({ postId: postId }: { postId: string }) {
   const { data } = useQuery({
     queryKey: ['post', postId],
     enabled: !!postId,
@@ -50,14 +50,11 @@ export default PostDetailPage;
 
 export async function getStaticPaths() {
   const postIdArr = [1, 2, 3];
-  console.log(
-    postIdArr.map((postId) => {
-      return { params: { postId: postId.toString() } };
-    }),
-  );
 
   return {
-    paths: [{ params: { postId: '1' } }, { params: { postId: '2' } }, { params: { postId: '3' } }],
+    paths: postIdArr.map((postId) => ({
+      params: { postId: postId.toString() },
+    })),
     fallback: true,
   };
 }
@@ -70,7 +67,7 @@ export async function getStaticProps({ params: { postId } }: { params: { postId:
   return {
     props: {
       dehydratedState: dehydrate(queryClient),
-      id: postId,
+      postId: postId,
     },
   };
 }
