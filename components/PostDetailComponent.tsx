@@ -1,30 +1,35 @@
-import styled from '@emotion/styled';
-import React, { useContext } from 'react';
-
-import axios from 'axios';
-
+import { ErrorMessage } from '@/components/ErrorMessage';
+import { ErrorBoundary } from 'react-error-boundary';
+import { getPostDetail } from '@/api/jsonplaceholder';
 import { ApiFetcher } from '@/components/ApiFetcher';
-import { ApiErrorBoundary } from '@/components/ApiErrorBoundary';
-import { usePostDetailQuery } from '@/hooks/usePostDetailQuery';
+import { useQueryClient } from '@tanstack/react-query';
+import { PostDetailType } from '@/types/jsonplaceholder';
 
-export default function PostDetailComponent({ post_id }: { post_id: string }) {
-  const { queryKey, queryFn } = usePostDetailQuery(post_id);
+export const PostDetailComponent = ({ postId }: { postId: string }) => {
+  const queryKey = ['postDetail', postId];
 
   return (
-    // TODO: 어떤 주제로 오류를 묶을지 미리 범주를 정의해두고 수집하는 것도 의미 있을듯(Sentry 등 미들웨어 데이터 적재 시 활용)
-    <ApiErrorBoundary>
-      <ApiFetcher queryKey={queryKey} queryFn={queryFn}>
-        <PresentationalComponent />
+    <ErrorBoundary
+      FallbackComponent={ErrorMessage}
+      onError={(error, componentStack) => {
+        console.log('postDetailComponent에서 error 발생, error시 error 처리 함수 생성 필요');
+      }}
+    >
+      <ApiFetcher queryKey={queryKey} queryFn={() => getPostDetail(postId)}>
+        <PresentationalComponent queryKey={queryKey} />
       </ApiFetcher>
-    </ApiErrorBoundary>
+    </ErrorBoundary>
   );
-}
+};
 
-function PresentationalComponent({ data }: any) {
+const PresentationalComponent = ({ queryKey }: { queryKey: string[] }) => {
+  const queryClient = useQueryClient();
+
+  const data = queryClient.getQueryData<PostDetailType>(queryKey);
   return (
     <div>
       <h2>클라이언트에서 부른 데이터</h2>
-      <p>{data.body}</p>
+      <p>{data?.body}</p>
     </div>
   );
-}
+};

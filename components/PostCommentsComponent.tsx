@@ -1,37 +1,39 @@
-import styled from '@emotion/styled';
-import React, { useContext } from 'react';
-
-import axios from 'axios';
-
+import { ErrorMessage } from '@/components/ErrorMessage';
+import { ErrorBoundary } from 'react-error-boundary';
+import { getPostComments } from '@/api/jsonplaceholder';
 import { ApiFetcher } from '@/components/ApiFetcher';
-import { ApiErrorBoundary } from '@/components/ApiErrorBoundary';
-import { usePostDetailQuery } from '@/hooks/usePostDetailQuery';
-import { usePostCommentsQuery } from '@/hooks/usePostCommentsQuery';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { PostCommentType } from '@/types/jsonplaceholder';
 
-export default function PostCommentsComponent({ post_id }: { post_id: string }) {
-  const { queryKey, queryFn } = usePostCommentsQuery(post_id);
+export const PostCommentsComponent = ({ postId }: { postId: string }) => {
+  const queryKey = ['postComments', postId];
 
   return (
-    // TODO: 어떤 주제로 오류를 묶을지 미리 범주를 정의해두고 수집하는 것도 의미 있을듯(Sentry 등 미들웨어 데이터 적재 시 활용)
-    <ApiErrorBoundary>
-      <ApiFetcher queryKey={queryKey} queryFn={queryFn}>
-        <PresentationalComponent />
+    <ErrorBoundary
+      FallbackComponent={ErrorMessage}
+      onError={(error, componentStack) => {
+        console.log('postCommentsComponent에서 error 발생, error시 error 처리 함수 생성 필요');
+      }}
+    >
+      <ApiFetcher queryKey={queryKey} queryFn={() => getPostComments(postId)}>
+        <PresentationalComponent queryKey={queryKey} />
       </ApiFetcher>
-    </ApiErrorBoundary>
+    </ErrorBoundary>
   );
-}
+};
 
-function PresentationalComponent({ data }: any) {
+const PresentationalComponent = ({ queryKey }: { queryKey: string[] }) => {
+  const queryClient = useQueryClient();
+
+  const data = queryClient.getQueryData<PostCommentType[]>(queryKey);
   return (
     <div>
       <h2>클라이언트에서 부른 데이터</h2>
       <ul>
         {data
-          .map((comment: any) => ({ ...comment, key: comment.id }))
-          .map((comment: any) => (
-            <li key={comment.key}>{comment.body}</li>
-          ))}
+          ?.map((comment: any) => ({ ...comment, key: comment.id }))
+          ?.map((comment: any) => <li key={comment.key}>{comment.body}</li>)}
       </ul>
     </div>
   );
-}
+};

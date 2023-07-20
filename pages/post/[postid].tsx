@@ -3,18 +3,15 @@ import styled from '@emotion/styled';
 import axios from 'axios';
 import Head from 'next/head';
 import { useQuery } from '@tanstack/react-query';
-import { ApiErrorBoundary } from '@/components/ApiErrorBoundary';
-import PostDetailComponent from '@/components/PostDetailComponent';
-import PostCommentsComponent from '@/components/PostCommentsComponent';
+import { PostDetailComponent } from '@/components/PostDetailComponent';
+import { PostCommentsComponent } from '@/components/PostCommentsComponent';
+import { getPostDetail } from '@/api/jsonplaceholder';
 
-function PostDetailPage({ id: post_id }: { id: string }) {
+function PostDetailPage({ id: postId }: { id: string }) {
   const { data } = useQuery({
-    queryKey: ['post', post_id],
-    enabled: !!post_id,
-    queryFn: async () => {
-      const { data } = await axios.get(`https://jsonplaceholder.typicode.com/posts/${post_id}`);
-      return data;
-    },
+    queryKey: ['post', postId],
+    enabled: !!postId,
+    queryFn: async () => getPostDetail(postId),
   });
 
   return (
@@ -23,8 +20,8 @@ function PostDetailPage({ id: post_id }: { id: string }) {
         <title>{data?.title}</title>
       </Head>
       <PostDetailStyledComponent>
-        <PostDetailComponent post_id={post_id} />
-        <PostCommentsComponent post_id={post_id} />
+        <PostDetailComponent postId={postId} />
+        <PostCommentsComponent postId={postId} />
         <div className={'serverside-rendered-data'}>
           <p>서버에서 렌더한 메타 데이터를 보여줌</p>
           <p>{data?.title}</p>
@@ -52,24 +49,28 @@ const PostDetailStyledComponent = styled.article`
 export default PostDetailPage;
 
 export async function getStaticPaths() {
+  const postIdArr = [1, 2, 3];
+  console.log(
+    postIdArr.map((postId) => {
+      return { params: { postId: postId.toString() } };
+    }),
+  );
+
   return {
-    paths: [{ params: { post_id: '1' } }, { params: { post_id: '2' } }, { params: { post_id: '3' } }],
+    paths: [{ params: { postId: '1' } }, { params: { postId: '2' } }, { params: { postId: '3' } }],
     fallback: true,
   };
 }
 
-export async function getStaticProps({ params: { post_id } }: { params: { post_id: string } }) {
+export async function getStaticProps({ params: { postId } }: { params: { postId: string } }) {
   const queryClient = new QueryClient();
   // 프리페치로 json placeholder 데이터를 적절히 axios get으로 호출해서 관리.
-  await queryClient.prefetchQuery(['post', post_id], async () => {
-    const { data } = await axios.get(`https://jsonplaceholder.typicode.com/posts/${post_id}`);
-    return data;
-  });
+  await queryClient.prefetchQuery(['post', postId], async () => getPostDetail(postId));
 
   return {
     props: {
       dehydratedState: dehydrate(queryClient),
-      id: post_id,
+      id: postId,
     },
   };
 }

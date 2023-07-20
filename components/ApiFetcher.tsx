@@ -1,16 +1,16 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AxiosResponse } from 'axios';
 
-export function ApiFetcher({
+export const ApiFetcher = ({
   queryKey,
   queryFn,
   children,
 }: {
-  queryKey: any;
-  queryFn: () => Promise<AxiosResponse<any>>;
+  queryKey: string[];
+  queryFn: () => Promise<any>;
   children: React.ReactNode;
-}) {
+}) => {
   const { isLoading, data, error } = useQuery(queryKey, queryFn);
 
   // TODO: 스켈레톤 추가 필요
@@ -21,5 +21,6 @@ export function ApiFetcher({
   if (error) {
     throw error;
   }
+
   return <>{children}</>;
-}
+};
