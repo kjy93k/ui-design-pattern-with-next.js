@@ -21,15 +21,5 @@ export function ApiFetcher({
   if (error) {
     throw error;
   }
-
-  return (
-    <>
-      {React.Children.map(children, (child: ReactNode) => {
-        if (React.isValidElement(child)) {
-          return React.cloneElement(child, { data } as object);
-        }
-        return child;
-      })}
-    </>
-  );
+  return <>{children}</>;
 }
